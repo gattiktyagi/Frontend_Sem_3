@@ -1,0 +1,31 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    padding: 20px;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #ffffff;
+}
+th, td {
+    border: 1px solid #333333;
+    padding: 12px;
+    text-align: center;
+}
+th {
+    background-color: #222222;
+    color: white;
+}
+.break-slot {
+    background-color: #f0f0f0;
+    font-weight: bold;
+}
+.lab-slot {
+    background-color: #e6f7ff;
+    font-weight: bold;
+}
+.day-header {
+    background-color: #dddddd;
+    font-weight: bold;
+}
