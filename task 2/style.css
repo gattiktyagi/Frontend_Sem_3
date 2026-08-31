@@ -1,0 +1,53 @@
+body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #fdf6e2;
+    color: #333333;
+}
+
+h1 {
+    color: rgb(34, 76, 56);
+    text-align: center;
+}
+
+h2 {
+    color: #d35400;
+}
+
+#about-card {
+    max-width: 500px;
+    margin: 40px auto;
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+}
+
+.subtitle {
+    text-align: center;
+    font-style: italic;
+    color: rgb(100, 100, 100);
+}
+
+ul {
+    list-style-type: "📍 ";
+    padding-left: 20px;
+}
+
+ol {
+    padding-left: 20px;
+}
+
+ol li {
+    margin-bottom: 8px;
+    padding: 4px;
+}
+
+ol li:nth-child(3) {
+    background-color: #c5505027;
+}
+
+li:hover {
+    color: rgb(34, 76, 56);
+    cursor: pointer;
+}
