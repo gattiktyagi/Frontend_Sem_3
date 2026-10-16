@@ -1,0 +1,18 @@
+.nav-item {
+    transition: 0.2s ease-in-out;
+}
+.nav-item:hover {
+    transform: scale(1.2);
+}
+.rocket {
+    display: inline-block;
+    animation: bounceRocket 1.2s infinite alternate ease-in-out;
+}
+@keyframes bounceRocket {
+    0% {
+        transform: translateY(0) scale(1.8);
+    }
+    100% {
+        transform: translateY(-8px) scale(1.8);
+    }
+}
