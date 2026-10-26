@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>JS Array Methods</title>
+</head>
+<body>
+  <h3>Open Browser Console (F12) to see output</h3>
+
+  <script>
+    const cart = [
+      { item: "Book", price: 200, inStock: true },
+      { item: "Pen", price: 50, inStock: false },
+      { item: "Bag", price: 1000, inStock: true }
+    ];
+
+    const available = cart.filter(p => p.inStock);
+    const discountedPrices = available.map(p => p.price * 0.9);
+    const total = discountedPrices.reduce((sum, price) => sum + price, 0);
+
+    available.forEach(p => console.log("Bought:", p.item));
+    console.log("Final Total:", total);
+  </script>
+</body>
+</html>
