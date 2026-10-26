@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Asynchronous Data Fetching</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --page: #e9eef5;
+    --card: #ffffff;
+    --text: #1c2438;
+    --muted: #6b7690;
+    --line: #dbe2ee;
+    --btn: #dfe6f5;
+    --btn-text: #2b3f8f;
+    --main: #1f7a6d;
+    --main-text: #ffffff;
+    --danger: #b4332b;
+    color-scheme: light;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #121722;
+      --card: #1b2232;
+      --text: #e8edf8;
+      --muted: #8d9bbd;
+      --line: #2c3650;
+      --btn: #31416e;
+      --btn-text: #cfdcff;
+      --main: #35b3a0;
+      --main-text: #06201c;
+      --danger: #ffb4ab;
+      color-scheme: dark;
+    }
+  }
+
+  html {
+    height: 100%;
+    scroll-padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  body {
+    min-height: 100%;
+    margin: 0;
+    padding: 24px 16px;
+    box-sizing: border-box;
+    background: var(--page);
+    color: var(--text);
+    font-family: "Sora", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+
+  .card {
+    max-width: 440px;
+    margin: 0 auto;
+    background: var(--card);
+    border-radius: 20px;
+    padding: 20px;
+  }
+
+  h1 {
+    margin: 0 0 6px;
+    font-size: 22px;
+  }
+
+  h2 {
+    margin: 18px 0 8px;
+    font-size: 16px;
+  }
+
+  p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .buttons {
+    display: flex;
+    gap: 8px;
+    margin: 16px 0;
+    flex-wrap: wrap;
+  }
+
+  button {
+    font-family: inherit;
+    font-size: 15px;
+    padding: 10px 14px;
+    border: none;
+    border-radius: 10px;
+    background: var(--btn);
+    color: var(--btn-text);
+    cursor: pointer;
+  }
+
+  #fetchBtn {
+    background: var(--main);
+    color: var(--main-text);
+  }
+
+  button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  button:focus-visible {
+    outline: 3px solid var(--btn-text);
+    outline-offset: 2px;
+  }
+
+  #status {
+    font-weight: 600;
+    min-height: 22px;
+  }
+
+  #status.error {
+    color: var(--danger);
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  #result li {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  #log li {
+    padding: 4px 0;
+    font-size: 14px;
+    color: var(--muted);
+  }
+</style>
+</head>
+
+<body>
+  <div class="card">
+    <h1>Asynchronous Data Fetching</h1>
+    <p>Pretend server that replies after 2 seconds.</p>
+
+    <div class="buttons">
+      <button id="fetchBtn">Fetch data</button>
+      <button id="errorBtn">Fetch with error</button>
+    </div>
+
+    <div id="status"></div>
+    <ul id="result"></ul>
+
+    <h2>What happened, in order</h2>
+    <ul id="log"></ul>
+  </div>
+
+  <script>
+    const fetchBtn = document.getElementById("fetchBtn");
+    const errorBtn = document.getElementById("errorBtn");
+    const statusText = document.getElementById("status");
+    const resultList = document.getElementById("result");
+    const logList = document.getElementById("log");
+
+    function fetchData(shouldFail) {
+      return new Promise(function (resolve, reject) {
+        setTimeout(function () {
+          if (shouldFail) {
+            reject("Server error: could not load the data.");
+          } else {
+            resolve([
+              { id: 1, name: "Asha", course: "Law" },
+              { id: 2, name: "Ravi", course: "History" },
+              { id: 3, name: "Meena", course: "Economics" }
+            ]);
+          }
+        }, 2000);
+      });
+    }
+
+    function addLog(message) {
+      const li = document.createElement("li");
+      li.textContent = message;
+      logList.appendChild(li);
+    }
+
+    function setButtons(disabled) {
+      fetchBtn.disabled = disabled;
+      errorBtn.disabled = disabled;
+    }
+
+    function loadData(shouldFail) {
+      setButtons(true);
+      statusText.className = "";
+      statusText.textContent = "Loading...";
+      resultList.innerHTML = "";
+      logList.innerHTML = "";
+
+      addLog("1. Request sent to the server");
+
+      fetchData(shouldFail)
+        .then(function (data) {
+          statusText.textContent = "Data loaded successfully";
+          data.forEach(function (student) {
+            const li = document.createElement("li");
+            li.textContent = student.id + ". " + student.name + " - " + student.course;
+            resultList.appendChild(li);
+          });
+          addLog("3. Promise resolved, data shown on the page");
+        })
+        .catch(function (error) {
+          statusText.className = "error";
+          statusText.textContent = error;
+          addLog("3. Promise rejected, error shown on the page");
+        })
+        .finally(function () {
+          setButtons(false);
+        });
+
+      addLog("2. Waiting for the response (the page is not frozen)");
+    }
+
+    fetchBtn.addEventListener("click", function () {
+      loadData(false);
+    });
+
+    errorBtn.addEventListener("click", function () {
+      loadData(true);
+    });
+  </script>
+</body>
+</html>
