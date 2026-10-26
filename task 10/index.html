@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Simple Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --page: #e9eef5;
+    --body: #ffffff;
+    --screen: #1f2a44;
+    --screen-text: #f2f6ff;
+    --screen-hint: #9fb0d6;
+    --key: #f1f4f9;
+    --key-text: #1c2438;
+    --op: #dfe6f5;
+    --op-text: #2b3f8f;
+    --clear: #fde3e1;
+    --clear-text: #b4332b;
+    --equals: #1f7a6d;
+    --equals-text: #ffffff;
+    color-scheme: light;
+
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --page: #121722;
+      --body: #1b2232;
+      --screen: #0d121c;
+      --screen-text: #f2f6ff;
+      --screen-hint: #8394bb;
+      --key: #262f45;
+      --key-text: #e8edf8;
+      --op: #31416e;
+      --op-text: #cfdcff;
+      --clear: #4a2a2a;
+      --clear-text: #ffb4ab;
+      --equals: #35b3a0;
+      --equals-text: #06201c;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page: #121722;
+    --body: #1b2232;
+    --screen: #0d121c;
+    --screen-text: #f2f6ff;
+    --screen-hint: #8394bb;
+    --key: #262f45;
+    --key-text: #e8edf8;
+    --op: #31416e;
+    --op-text: #cfdcff;
+    --clear: #4a2a2a;
+    --clear-text: #ffb4ab;
+    --equals: #35b3a0;
+    --equals-text: #06201c;
+    color-scheme: dark;
+  }
+  html { height: 100%; scroll-padding-top: env(safe-area-inset-top, 0px); }
+  body {
+    min-height: 100%;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--page);
+    font-family: "Sora", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  .calculator {
+    width: 320px;
+    max-width: 92vw;
+    padding: 16px;
+    background: var(--body);
+    border-radius: 24px;
+  }
+  .screen {
+    background: var(--screen);
+    color: var(--screen-text);
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 14px;
+    text-align: right;
+  }
+  .history {
+    min-height: 20px;
+    font-size: 14px;
+    color: var(--screen-hint);
+  }
+  .current {
+    font-size: 34px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    overflow-x: auto;
+  }
+  .keys {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  button {
+    font-family: inherit;
+    font-size: 20px;
+    padding: 16px 0;
+    border: none;
+    border-radius: 12px;
+    background: var(--key);
+    color: var(--key-text);
+    cursor: pointer;
+  }
+  button:active { transform: scale(0.96); }
+  button:focus-visible { outline: 3px solid var(--op-text); outline-offset: 2px; }
+  .op { background: var(--op); color: var(--op-text); }
+  .clear { background: var(--clear); color: var(--clear-text); }
+  .equals { background: var(--equals); color: var(--equals-text); }
+  .wide { grid-column: span 2; }
+</style>
+</head>
+<body>
+  <div class="calculator">
+    <div class="screen">
+      <div class="history" id="history"></div>
+      <div class="current" id="display">0</div>
+    </div>
+    <div class="keys">
+      <button class="clear wide" onclick="clearAll()">Clear</button>
+      <button class="clear" onclick="deleteLast()">Del</button>
+      <button class="op" onclick="pressOperator('÷')">÷</button>
+      <button onclick="pressNumber('7')">7</button>
+      <button onclick="pressNumber('8')">8</button>
+      <button onclick="pressNumber('9')">9</button>
+      <button class="op" onclick="pressOperator('×')">×</button>
+      <button onclick="pressNumber('4')">4</button>
+      <button onclick="pressNumber('5')">5</button>
+      <button onclick="pressNumber('6')">6</button>
+      <button class="op" onclick="pressOperator('-')">−</button>
+      <button onclick="pressNumber('1')">1</button>
+      <button onclick="pressNumber('2')">2</button>
+      <button onclick="pressNumber('3')">3</button>
+      <button class="op" onclick="pressOperator('+')">+</button>
+      <button class="wide" onclick="pressNumber('0')">0</button>
+      <button onclick="pressNumber('.')">.</button>
+      <button class="equals" onclick="pressEquals()">=</button>
+    </div>
+  </div>
+  <script>
+    let current = "0";
+    let previous = "";
+    let operator = "";
+    let startNew = false;
+    const display = document.getElementById("display");
+    const history = document.getElementById("history");
+    function updateScreen() {
+      display.textContent = current;
+      history.textContent = operator ? previous + " " + operator : "";
+    }
+    function pressNumber(n) {
+      if (startNew) {
+        current = "0";
+        startNew = false;
+      }
+      if (n === "." && current.includes(".")) return;
+      if (current === "0" && n !== ".") {
+        current = n;
+      } else {
+        current = current + n;
+      }
+      updateScreen();
+    }
+    function pressOperator(op) {
+      if (isNaN(parseFloat(current))) clearAll();
+      if (operator !== "" && !startNew) calculate();
+
+      previous = current;
+      operator = op;
+      startNew = true;
+      updateScreen();
+    }
+    function calculate() {
+      if (operator === "") return;
+      const a = parseFloat(previous);
+      const b = parseFloat(current);
+      let result;
+      if (operator === "+") result = a + b;
+      if (operator === "-") result = a - b;
+      if (operator === "×") result = a * b;
+      if (operator === "÷") {
+        if (b === 0) {
+          current = "Cannot divide by 0";
+          previous = "";
+          operator = "";
+          startNew = true;
+          return;
+        }
+        result = a / b;
+      }
+      current = String(parseFloat(result.toFixed(10)));
+      previous = "";
+      operator = "";
+      startNew = true;
+    }
+    function pressEquals() {
+      calculate();
+      updateScreen();
+    }
+    function clearAll() {
+      current = "0";
+      previous = "";
+      operator = "";
+      startNew = false;
+      updateScreen();
+    }
+    function deleteLast() {
+      if (startNew) return;
+      current = current.slice(0, -1);
+      if (current === "" || current === "-") current = "0";
+      updateScreen();
+    }
+  </script>
+</body>
+</html>
