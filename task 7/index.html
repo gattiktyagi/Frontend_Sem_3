@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>To-Do List</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --page: #e9eef5;
+    --card: #ffffff;
+    --text: #1c2438;
+    --line: #dbe2ee;
+    --btn: #dfe6f5;
+    --btn-text: #2b3f8f;
+    --main: #1f7a6d;
+    --main-text: #ffffff;
+    --danger: #b4332b;
+    color-scheme: light;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #121722;
+      --card: #1b2232;
+      --text: #e8edf8;
+      --line: #2c3650;
+      --btn: #31416e;
+      --btn-text: #cfdcff;
+      --main: #35b3a0;
+      --main-text: #06201c;
+      --danger: #ffb4ab;
+      color-scheme: dark;
+    }
+  }
+
+  html {
+    height: 100%;
+    scroll-padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  body {
+    min-height: 100%;
+    margin: 0;
+    padding: 24px 16px;
+    box-sizing: border-box;
+    background: var(--page);
+    color: var(--text);
+    font-family: "Sora", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+
+  .card {
+    max-width: 420px;
+    margin: 0 auto;
+    background: var(--card);
+    border-radius: 20px;
+    padding: 20px;
+  }
+
+  h1 {
+    margin: 0 0 14px;
+    font-size: 22px;
+  }
+
+  .add {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  input[type="text"] {
+    flex: 1;
+    min-width: 0;
+    font-family: inherit;
+    font-size: 15px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: transparent;
+    color: var(--text);
+  }
+
+  button {
+    font-family: inherit;
+    font-size: 15px;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 10px;
+    background: var(--btn);
+    color: var(--btn-text);
+    cursor: pointer;
+  }
+
+  #addBtn {
+    background: var(--main);
+    color: var(--main-text);
+  }
+
+  button:focus-visible,
+  input:focus-visible {
+    outline: 3px solid var(--btn-text);
+    outline-offset: 2px;
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  li span {
+    flex: 1;
+    overflow-wrap: anywhere;
+  }
+
+  li input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+  }
+
+  li button {
+    padding: 6px 10px;
+  }
+
+  li .delete {
+    color: var(--danger);
+  }
+</style>
+</head>
+
+<body>
+  <div class="card">
+    <h1>To-Do List</h1>
+    <div class="add">
+      <input type="text" id="taskInput" placeholder="Add a task">
+      <button id="addBtn">Add</button>
+    </div>
+    <ul id="taskList"></ul>
+  </div>
+
+  <script>
+    const taskInput = document.getElementById("taskInput");
+    const addBtn = document.getElementById("addBtn");
+    const taskList = document.getElementById("taskList");
+
+    function createTask(text) {
+      const li = document.createElement("li");
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+
+      const label = document.createElement("span");
+      label.textContent = text;
+
+      const upBtn = document.createElement("button");
+      upBtn.textContent = "↑";
+      upBtn.setAttribute("aria-label", "Move up");
+
+      const downBtn = document.createElement("button");
+      downBtn.textContent = "↓";
+      downBtn.setAttribute("aria-label", "Move down");
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.textContent = "✕";
+      deleteBtn.className = "delete";
+      deleteBtn.setAttribute("aria-label", "Delete task");
+
+      checkbox.addEventListener("change", function () {
+        if (checkbox.checked) {
+          label.style.textDecoration = "line-through";
+          label.style.opacity = "0.5";
+        } else {
+          label.style.textDecoration = "none";
+          label.style.opacity = "1";
+        }
+      });
+
+      upBtn.addEventListener("click", function () {
+        const previousItem = li.previousElementSibling;
+        if (previousItem) {
+          taskList.insertBefore(li, previousItem);
+        }
+      });
+
+      downBtn.addEventListener("click", function () {
+        const nextItem = li.nextElementSibling;
+        if (nextItem) {
+          taskList.insertBefore(nextItem, li);
+        }
+      });
+
+      deleteBtn.addEventListener("click", function () {
+        li.remove();
+      });
+
+      li.append(checkbox, label, upBtn, downBtn, deleteBtn);
+      taskList.appendChild(li);
+    }
+
+    function addTask() {
+      const text = taskInput.value.trim();
+      if (text === "") {
+        return;
+      }
+      createTask(text);
+      taskInput.value = "";
+      taskInput.focus();
+    }
+
+    addBtn.addEventListener("click", addTask);
+
+    taskInput.addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        addTask();
+      }
+    });
+
+    createTask("Read chapter 5");
+    createTask("Practice JavaScript");
+    createTask("Revise notes");
+  </script>
+</body>
+</html>
