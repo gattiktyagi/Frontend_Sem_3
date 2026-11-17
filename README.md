@@ -7,3 +7,4 @@ Repository for my 3rd-semester Frontend lab tasks.
 * **task 2**
 * **task 3**
 * **task 4**
+* **task 5**
