@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Essay Character Checker</title>
+  <style>
+    body {
+      font-family: Arial;
+      background-color: #f0f2f5;
+      text-align: center;
+      padding-top: 60px;
+    }
+
+    .box {
+      background-color: white;
+      width: 360px;
+      margin: auto;
+      padding: 20px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+
+    input {
+      width: 80px;
+      padding: 5px;
+      font-size: 15px;
+      margin-bottom: 12px;
+    }
+
+    textarea {
+      width: 90%;
+      height: 150px;
+      font-size: 16px;
+      padding: 8px;
+    }
+
+    p {
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: #333;
+      color: white;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 5px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="box">
+    <h2>Essay Character Checker</h2>
+    
+    <label>Essay Limit: </label>
+    <input type="number" id="limit-input" value="500">
+
+    <textarea id="text-input" maxlength="500" placeholder="Start writing your essay..."></textarea>
+    
+    <p id="status-text">0 / 500 - Ready to write</p>
+    <button id="clear-btn">Clear Essay</button>
+  </div>
+
+  <script>
+    const limitInput = document.getElementById("limit-input");
+    const textInput = document.getElementById("text-input");
+    const statusText = document.getElementById("status-text");
+    const clearBtn = document.getElementById("clear-btn");
+
+    limitInput.addEventListener("input", function() {
+      const limit = Number(limitInput.value);
+      textInput.maxLength = limit;
+      statusText.textContent = textInput.value.length + " / " + limit + " - Ready to write";
+    });
+
+    textInput.addEventListener("input", function() {
+      const length = textInput.value.length;
+      const limit = Number(limitInput.value);
+
+      if (length === 0) {
+        document.body.style.backgroundColor = "#f0f2f5";
+        statusText.textContent = "0 / " + limit + " - Ready to write";
+      } else if (length <= limit * 0.4) {
+        document.body.style.backgroundColor = "#d4edda"; // Green (0% - 40%)
+        statusText.textContent = length + " / " + limit + " - Plenty of room";
+      } else if (length <= limit * 0.8) {
+        document.body.style.backgroundColor = "#fff3cd"; // Yellow (41% - 80%)
+        statusText.textContent = length + " / " + limit + " - Main body in progress";
+      } else if (length < limit) {
+        document.body.style.backgroundColor = "#ffe5d0"; // Orange (81% - 99%)
+        statusText.textContent = length + " / " + limit + " - Wrap up conclusion";
+      } else {
+        document.body.style.backgroundColor = "#f8d7da"; // Red (100%)
+        statusText.textContent = limit + " / " + limit + " - Essay limit reached!";
+      }
+    });
+
+    clearBtn.addEventListener("click", function() {
+      const limit = Number(limitInput.value);
+      textInput.value = "";
+      document.body.style.backgroundColor = "#f0f2f5";
+      statusText.textContent = "0 / " + limit + " - Ready to write";
+    });
+  </script>
+
+</body>
+</html>
